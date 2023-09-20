@@ -1,0 +1,58 @@
+package main
+
+import (
+	"context"
+	"github.com/aws/aws-lambda-go/events"
+	"log"
+	"net/http"
+)
+
+func router(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	log.Printf("Received req %#v", req)
+
+	switch req.HTTPMethod {
+	case "GET":
+		return processGet(ctx, req)
+	case "POST":
+		return processPost(ctx, req)
+	case "DELETE":
+		return processDelete(ctx, req)
+	case "PUT":
+		return processPut(ctx, req)
+	default:
+		return clientError(http.StatusMethodNotAllowed)
+	}
+}
+
+func processGet(ctx context.Context, req events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
+	return events.APIGatewayProxyResponse{}
+}
+
+func processPost(ctx context.Context, req events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
+	return events.APIGatewayProxyResponse{}
+}
+
+func processDelete(ctx context.Context, req events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
+	return events.APIGatewayProxyResponse{}
+}
+
+func processPut(ctx context.Context, req events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
+	return events.APIGatewayProxyResponse{}
+}
+
+func clientError(status int) (events.APIGatewayProxyResponse, error) {
+
+	return events.APIGatewayProxyResponse{
+		Body:       http.StatusText(status),
+		StatusCode: status,
+	}, nil
+}
+
+func serverError(err error) (events.APIGatewayProxyResponse, error) {
+	log.Println(err.Error())
+
+	return events.APIGatewayProxyResponse{
+		Body:       http.StatusText(http.StatusInternalServerError),
+		StatusCode: http.StatusInternalServerError,
+	}, nil
+}
