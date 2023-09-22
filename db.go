@@ -2,6 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/config"
 	_ "github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	_ "github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
@@ -14,7 +17,7 @@ const TableName = "Resume"
 var db dynamodb.Client
 
 func init() {
-	sdkConfig, err := config.LoadDefaultConfig(context.RESUME())
+	sdkConfig, err := config.LoadDefaultConfig(context.Resume())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -55,4 +58,64 @@ type Project struct {
 type Skill struct {
 	Id   string `json:"id" dynamodbav:"id"`
 	Name string `json:"name" dynamodbav:"name"`
+}
+
+func saveResume(ctx context.Context, resume Resume) error {
+	// Use the DynamoDB client to save the resume item
+	av, err := dynamodbattribute.MarshalMap(resume)
+	if err != nil {
+		log.Printf("Error marshaling resume: %v", err)
+		return err
+	}
+
+	input := &dynamodb.PutItemInput{
+		Item:      av,
+		TableName: &TableName,
+	}
+
+	_, err = db.PutItem(ctx, input)
+	if err != nil {
+		log.Printf("Error saving resume: %v", err)
+		return err
+	}
+
+	return nil
+}
+
+func getResume(ctx context.Context, resumeID string) (Resume, error) {
+	// Use the DynamoDB client to retrieve the resume item
+	input := &dynamodb.GetItemInput{
+		Key: map[string]dynamodb.AttributeValue{
+			"id": &dynamodb.AttributeValue{
+				S: &resumeID,
+			},
+		},
+		TableName: &TableName,
+	}
+
+	result, err := db.GetItem(ctx, input)
+	if err != nil {
+		log.Printf("Error fetching resume: %v", err)
+		return Resume{}, err
+	}
+
+	if len(result.Item) == 0 {
+		return Resume{}, fmt.Errorf("Resume not found")
+	}
+
+	var resume Resume
+	err = dynamodbattribute.UnmarshalMap(result.Item, &resume)
+	if err != nil {
+		log.Printf("Error unmarshaling resume: %v", err)
+		return Resume{}, err
+	}
+
+	return resume, nil
+}
+
+func main() {
+	// Lambda function entry point
+	lambda.Start(func(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+		// Your code here to handle API requests and interact with DynamoDB
+	})
 }
