@@ -3,26 +3,26 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/aws/aws-sdk-go-v2/config"
-	_ "github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
-	_ "github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
-	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"log"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb/dynamodbattribute"
 )
 
 const TableName = "Resume"
 
-var db dynamodb.Client
+var db *dynamodb.Client
 
 func init() {
-	sdkConfig, err := config.LoadDefaultConfig(context.Resume())
+	ctx := context.Background()
+	cfg, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	db = *dynamodb.NewFromConfig(sdkConfig)
+	db = dynamodb.NewFromConfig(cfg)
 }
 
 type Resume struct {
@@ -61,18 +61,20 @@ type Skill struct {
 }
 
 func saveResume(ctx context.Context, resume Resume) error {
-	// Use the DynamoDB client to save the resume item
+	// Marshal the Resume object into a DynamoDB AttributeValue map
 	av, err := dynamodbattribute.MarshalMap(resume)
 	if err != nil {
 		log.Printf("Error marshaling resume: %v", err)
 		return err
 	}
 
+	// Create a PutItemInput with the marshaled Resume and table name
 	input := &dynamodb.PutItemInput{
 		Item:      av,
-		TableName: &TableName,
+		TableName: aws.String(TableName),
 	}
 
+	// Put the item into the DynamoDB table
 	_, err = db.PutItem(ctx, input)
 	if err != nil {
 		log.Printf("Error saving resume: %v", err)
@@ -83,26 +85,29 @@ func saveResume(ctx context.Context, resume Resume) error {
 }
 
 func getResume(ctx context.Context, resumeID string) (Resume, error) {
-	// Use the DynamoDB client to retrieve the resume item
+	// Create a GetItemInput with the key and table name
 	input := &dynamodb.GetItemInput{
 		Key: map[string]dynamodb.AttributeValue{
 			"id": &dynamodb.AttributeValue{
-				S: &resumeID,
+				S: aws.String(resumeID),
 			},
 		},
-		TableName: &TableName,
+		TableName: aws.String(TableName),
 	}
 
+	// Get the item from the DynamoDB table
 	result, err := db.GetItem(ctx, input)
 	if err != nil {
 		log.Printf("Error fetching resume: %v", err)
 		return Resume{}, err
 	}
 
+	// Check if the item was found
 	if len(result.Item) == 0 {
 		return Resume{}, fmt.Errorf("Resume not found")
 	}
 
+	// Unmarshal the DynamoDB item into a Resume object
 	var resume Resume
 	err = dynamodbattribute.UnmarshalMap(result.Item, &resume)
 	if err != nil {
@@ -111,11 +116,4 @@ func getResume(ctx context.Context, resumeID string) (Resume, error) {
 	}
 
 	return resume, nil
-}
-
-func main() {
-	// Lambda function entry point
-	lambda.Start(func(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-		// Your code here to handle API requests and interact with DynamoDB
-	})
 }
