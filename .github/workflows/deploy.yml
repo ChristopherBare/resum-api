@@ -1,0 +1,40 @@
+name: Deploy Go Lambda Function
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 0.14.x
+
+      - name: Initialize Terraform
+        run: terraform init ./terraform
+
+      - name: Apply Terraform Changes
+        run: terraform apply -auto-approve ./terraform
+
+      - name: Upload Lambda Code to S3
+        run: |
+          # Build your Go Lambda code
+          go build -o main ./lambda
+          zip -j lambda.zip main
+          aws s3 cp lambda.zip s3://my-lambda-deployment-bucket/lambda.zip
+
+      - name: Deploy Lambda Code
+        run: |
+          aws lambda update-function-code --function-name my-go-lambda-function --s3-bucket my-lambda-deployment-bucket --s3-key lambda.zip
+
+      - name: Clean Up
+        run: terraform destroy -auto-approve ./terraform
+        if: always()
