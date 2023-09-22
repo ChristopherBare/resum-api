@@ -3,7 +3,7 @@ name: Deploy Go Lambda Function
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   deploy:
