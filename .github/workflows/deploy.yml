@@ -10,6 +10,20 @@ permissions:
   contents: read
 
 jobs:
+  generate-lambda-zip:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Generate Lambda ZIP
+        run: |
+          # Build your Go Lambda code
+          go build -o main ./lambda
+          zip -j lambda.zip main
+          echo "Lambda ZIP generated successfully"
+        working-directory: ${{ github.workspace }}
   deploy:
     runs-on: ubuntu-latest
 
@@ -31,11 +45,15 @@ jobs:
         with:
           terraform_version: 0.14.x
 
-      - name: Initialize Terraform
-        run: terraform init ./terraform
+      - name: Upload Lambda Code to S3
+        run: |
+          aws s3 cp lambda.zip s3://${{ needs.deploy.outputs.lambda_bucket_name }}/lambda.zip
+        if: success()
 
-      - name: Apply Terraform Changes
-        run: terraform apply -auto-approve ./terraform
+      - name: Deploy Lambda Code
+        run: |
+          aws lambda update-function-code --function-name ${{ needs.deploy.outputs.lambda_function_name }} --s3-bucket ${{ needs.deploy.outputs.lambda_bucket_name }} --s3-key lambda.zip
+        if: success()
 
       - name: Clean Up
         run: terraform destroy -auto-approve ./terraform
