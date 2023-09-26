@@ -1,5 +1,4 @@
 resource "aws_lambda_function" "resum_api_lambda" {
-  filename         = "lambda.zip"
   function_name    = "resum-api-lambda"
   role             = aws_iam_role.lambda_exec_role.arn
   handler          = "main" # Change to your Go function's handler name
