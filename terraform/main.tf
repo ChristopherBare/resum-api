@@ -5,7 +5,7 @@ resource "aws_lambda_function" "resum_api_lambda" {
   runtime          = "go1.x"
 
   # Use the S3 bucket as the source code
-  s3_bucket = aws_s3_bucket.lambda_bucket.id
+  s3_bucket = aws_s3_bucket.lambda_bucket.bucket
   s3_key    = "lambda.zip"
 }
 
