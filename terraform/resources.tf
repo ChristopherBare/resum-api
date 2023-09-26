@@ -41,8 +41,9 @@ resource "aws_lambda_permission" "apigw_lambda" {
 }
 
 resource "aws_s3_bucket" "lambda_bucket" {
-  bucket = "${aws_lambda_function.resum_api_lambda.function_name}-bucket"
+  bucket = "lambda-bucket-${random_uuid.uuid.result}"
 }
 
+resource "random_uuid" "uuid" {}
 
 
