@@ -42,7 +42,6 @@ resource "aws_lambda_permission" "apigw_lambda" {
 
 resource "aws_s3_bucket" "lambda_bucket" {
   bucket = "lambda-bucket"
-  region = "us-east-1"
 }
 
 
