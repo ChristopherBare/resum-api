@@ -24,6 +24,10 @@ jobs:
       - name: Apply Terraform Changes
         run: terraform apply -auto-approve ./terraform
 
+      - name: Clean Up
+        run: terraform destroy -auto-approve ./terraform
+        if: always()
+
       - name: Upload Lambda Code to S3
         run: |
           # Build your Go Lambda code
@@ -35,6 +39,4 @@ jobs:
         run: |
           aws lambda update-function-code --function-name ${{ needs.deploy.outputs.lambda_function_name }} --s3-bucket ${{ needs.deploy.outputs.lambda_bucket_name }} --s3-key lambda.zip
 
-      - name: Clean Up
-        run: terraform destroy -auto-approve ./terraform
-        if: always()
+      
