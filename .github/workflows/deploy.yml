@@ -1,4 +1,4 @@
-name: Deploy Resum-API
+name: Deploy Go Lambda Function
 
 on:
   push:
@@ -8,10 +8,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
-    env:
-      LAMBDA_FUNCTION_NAME: ${{ steps.outputs.lambda_function_name }}
-      LAMBDA_BUCKET_NAME: ${{ steps.outputs.lambda_bucket_name }}
 
     steps:
       - name: Checkout Repository
@@ -30,14 +26,14 @@ jobs:
 
       - name: Upload Lambda Code to S3
         run: |
-          # Build Go Lambda code
+          # Build your Go Lambda code
           go build -o main ./lambda
           zip -j lambda.zip main
-          aws s3 cp lambda.zip s3://${{ env.LAMBDA_BUCKET_NAME }}/lambda.zip
+          aws s3 cp lambda.zip s3://${{ needs.deploy.outputs.lambda_bucket_name }}/lambda.zip
 
       - name: Deploy Lambda Code
         run: |
-          aws lambda update-function-code --function-name ${{ env.LAMBDA_FUNCTION_NAME }} --s3-bucket ${{ env.LAMBDA_BUCKET_NAME }} --s3-key lambda.zip
+          aws lambda update-function-code --function-name ${{ needs.deploy.outputs.lambda_function_name }} --s3-bucket ${{ needs.deploy.outputs.lambda_bucket_name }} --s3-key lambda.zip
 
       - name: Clean Up
         run: terraform destroy -auto-approve ./terraform
