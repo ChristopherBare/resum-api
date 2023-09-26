@@ -5,7 +5,7 @@ resource "aws_api_gateway_rest_api" "resum_api" {
 
 resource "aws_api_gateway_resource" "api_resource" {
   parent_id = aws_api_gateway_rest_api.resum_api.root_resource_id
-  path_part = "example"
+  path_part = "resume"
   rest_api_id = aws_api_gateway_rest_api.resum_api.id
 }
 
@@ -42,6 +42,7 @@ resource "aws_lambda_permission" "apigw_lambda" {
 
 resource "aws_s3_bucket" "lambda_bucket" {
   bucket = "lambda-bucket"
+  region = "us-east-1"
 }
 
 
