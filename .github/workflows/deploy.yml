@@ -9,7 +9,18 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: us-east-1
+
     steps:
+      - name: configureawscredentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::726032046446:role/github-actions-role
+          role-session-name: samplerolesession
+          aws-region: ${{env.AWS_DEFAULT_REGION}}
       - name: Checkout Repository
         uses: actions/checkout@v2
 
