@@ -60,9 +60,9 @@ jobs:
           name: lambda-artifact
           path: ./lambda.zip
 
-      - name: Terraform Apply
+      - name: Terraform Apply Stage 1
         run: |
-          cd ./terraform
+          cd ./terraform/stage_1
           terraform init
           terraform apply -auto-approve
 
@@ -70,6 +70,12 @@ jobs:
         run: |
           aws s3 cp lambda.zip s3://${{ needs.deploy.outputs.lambda_bucket_name }}/lambda.zip
         if: success()
+
+      - name: Terraform Apply Stage 2
+        run: |
+          cd ./terraform/stage_2
+          terraform init
+          terraform apply -auto-approve
 
       - name: Deploy Lambda Code
         run: |

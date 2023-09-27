@@ -40,10 +40,4 @@ resource "aws_lambda_permission" "apigw_lambda" {
   source_arn    = aws_api_gateway_deployment.api_deployment.execution_arn
 }
 
-resource "aws_s3_bucket" "lambda_bucket" {
-  bucket = "lambda-bucket-${random_uuid.uuid.result}"
-}
-
-resource "random_uuid" "uuid" {}
-
 
