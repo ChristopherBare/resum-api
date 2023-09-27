@@ -12,8 +12,7 @@ permissions:
 jobs:
   generate-lambda-zip:
     runs-on: ubuntu-latest
-    outputs:
-      lambda_bucket_name: ${{ steps.read-output.outputs.lambda_bucket_name }}
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -32,26 +31,18 @@ jobs:
           name: lambda-artifact
           path: ./lambda.zip
 
-      - name: Capture Terraform Output
-        run: |
-          echo "lambda_bucket_name=$(terraform output -raw lambda_bucket_name)" >> output.txt
-          echo $(terraform output -raw lambda_bucket_name)
-        working-directory: ./terraform/stage_1
 
-      - name: Read Terraform Output
-        id: read-output
-        run: |
-          echo "::set-output name=lambda_bucket_name::$(cat output.txt)"
-        working-directory: ./terraform/stage_1
 
   deploy:
     runs-on: ubuntu-latest
 
     needs: generate-lambda-zip
 
+    outputs:
+      lambda_bucket_name: ${{ steps.read-output.outputs.lambda_bucket_name }}
+
     env:
       AWS_DEFAULT_REGION: us-east-1
-
 
     steps:
       - name: configureawscredentials
@@ -79,6 +70,18 @@ jobs:
           cd ./terraform/stage_1
           terraform init
           terraform apply -auto-approve
+
+      - name: Capture Terraform Output
+        run: |
+          echo "lambda_bucket_name=$(terraform output -raw lambda_bucket_name)" >> output.txt
+          echo $(terraform output -raw lambda_bucket_name)
+        working-directory: ./terraform/stage_1
+
+      - name: Read Terraform Output
+        id: read-output
+        run: |
+          echo "::set-output name=lambda_bucket_name::$(cat output.txt)"
+        working-directory: ./terraform/stage_1
 
       - name: Upload Lambda Code to S3
         run: |
