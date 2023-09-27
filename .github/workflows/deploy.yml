@@ -20,7 +20,7 @@ jobs:
       - name: Generate Lambda ZIP
         run: |
           # Build your Go Lambda code
-          go build -o main ./
+          go build -o main
           zip -j lambda.zip main
           echo "Lambda ZIP generated successfully"
         working-directory: ${{ github.workspace }}
@@ -57,6 +57,12 @@ jobs:
         with:
           name: lambda-artifact
           path: ./lambda.zip
+
+      - name: Terraform Apply
+        run: |
+          cd ./terraform
+          terraform init
+          terraform apply -auto-approve
 
       - name: Upload Lambda Code to S3
         run: |
