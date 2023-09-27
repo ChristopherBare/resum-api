@@ -88,6 +88,8 @@ jobs:
           echo needs.deploy.outputs.lambda_bucket_name
           echo deploy.outputs.lambda_bucket_name
           echo steps.outputs.lambda_bucket_name
+          echo lambda_bucket_name
+          echo outputs.lambda_bucket_name
           aws s3 cp lambda.zip s3://${{ needs.deploy.outputs.lambda_bucket_name }}/lambda.zip
         if: success()
 
