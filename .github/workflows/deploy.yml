@@ -35,6 +35,7 @@ jobs:
       - name: Capture Terraform Output
         run: |
           echo "lambda_bucket_name=$(terraform output -raw lambda_bucket_name)" >> output.txt
+          echo $(terraform output -raw)
         working-directory: ./terraform/stage_1
 
       - name: Read Terraform Output
