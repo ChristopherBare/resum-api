@@ -4,9 +4,6 @@ resource "aws_lambda_function" "resum_api_lambda" {
   handler          = "main" # Change to your Go function's handler name
   runtime          = "go1.x"
 
-  # Use the S3 bucket as the source code
-  s3_bucket = aws_s3_bucket.lambda_bucket.bucket
-  s3_key    = "lambda.zip"
 }
 
 resource "aws_iam_role" "lambda_exec_role" {
