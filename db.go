@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"log"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -61,7 +62,7 @@ type Skill struct {
 
 func saveResume(ctx context.Context, resume Resume) error {
 	// Marshal the Resume object into a DynamoDB AttributeValue map
-	av, err := dynamodbattribute.MarshalMap(resume)
+	av, err := attributevalue.MarshalMap(resume)
 	if err != nil {
 		log.Printf("Error marshaling resume: %v", err)
 		return err
@@ -108,7 +109,7 @@ func getResume(ctx context.Context, resumeID string) (Resume, error) {
 
 	// Unmarshal the DynamoDB item into a Resume object
 	var resume Resume
-	err = dynamodbattribute.UnmarshalMap(result.Item, &resume)
+	err = attributevalue.UnmarshalMap(result.Item, &resume)
 	if err != nil {
 		log.Printf("Error unmarshaling resume: %v", err)
 		return Resume{}, err
