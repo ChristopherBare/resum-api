@@ -38,6 +38,7 @@ jobs:
 
     env:
       AWS_DEFAULT_REGION: us-east-1
+      S3_BUCKET_NAME: ${{ steps.read-output.outputs.bucket_name }}
 
     steps:
       - name: configureawscredentials
@@ -66,6 +67,17 @@ jobs:
           terraform init
           terraform apply -auto-approve
           BUCKET_NAME=$(terraform output -raw lambda_bucket_name)"
+
+      - name: Capture Terraform Output
+        run: |
+          echo "bucket_name=$(terraform output -raw bucket_name)" >> output.txt
+        working-directory: ./terraform/stage_1
+
+      - name: Read Terraform Output
+        id: read-output
+        run: |
+          echo "::set-output name=bucket_name::$(cat output.txt)"
+        working-directory: ./terraform/stage_1
 
       - name: Upload Lambda Code to S3
         run: |
