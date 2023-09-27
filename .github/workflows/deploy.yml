@@ -32,6 +32,17 @@ jobs:
           name: lambda-artifact
           path: ./lambda.zip
 
+      - name: Capture Terraform Output
+        run: |
+          echo "lambda_bucket_name=$(terraform output -raw lambda_bucket_name)" >> output.txt
+        working-directory: ./terraform/stage_1
+
+      - name: Read Terraform Output
+        id: read-output
+        run: |
+          echo "::set-output name=lambda_bucket_name::$(cat output.txt)"
+        working-directory: ./terraform/stage_1
+
   deploy:
     runs-on: ubuntu-latest
 
@@ -67,17 +78,6 @@ jobs:
           cd ./terraform/stage_1
           terraform init
           terraform apply -auto-approve
-
-      - name: Capture Terraform Output
-        run: |
-          echo "bucket_name=$(terraform output -raw lambda_bucket_name)" >> output.txt
-        working-directory: ./terraform/stage_1
-
-      - name: Read Terraform Output
-        id: read-output
-        run: |
-          echo "::set-output name=lambda_bucket_name::$(cat output.txt)"
-        working-directory: ./terraform/stage_1
 
       - name: Upload Lambda Code to S3
         run: |
