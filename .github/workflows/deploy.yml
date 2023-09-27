@@ -20,7 +20,7 @@ jobs:
       - name: Generate Lambda ZIP
         run: |
           # Build your Go Lambda code
-          go build -o main ./lambda
+          go build -o main ./
           zip -j lambda.zip main
           echo "Lambda ZIP generated successfully"
         working-directory: ${{ github.workspace }}
