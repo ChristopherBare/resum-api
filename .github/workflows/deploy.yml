@@ -85,7 +85,7 @@ jobs:
 
       - name: Upload Lambda Code to S3
         run: |
-          aws s3 cp lambda.zip s3://${{ needs.generate-lambda-zip.outputs.lambda_bucket_name }}/lambda.zip
+          aws s3 cp lambda.zip s3://${{ needs.deploy.outputs.lambda_bucket_name }}/lambda.zip
         if: success()
 
       - name: Terraform Apply Stage 2
