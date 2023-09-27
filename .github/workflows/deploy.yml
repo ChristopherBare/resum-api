@@ -24,6 +24,13 @@ jobs:
           zip -j lambda.zip main
           echo "Lambda ZIP generated successfully"
         working-directory: ${{ github.workspace }}
+
+      - name: Upload Lambda ZIP Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: lambda-artifact
+          path: ./lambda.zip
+
   deploy:
     runs-on: ubuntu-latest
 
@@ -45,6 +52,12 @@ jobs:
         with:
           terraform_version: 0.14.x
 
+      - name: Download Lambda ZIP Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: lambda-artifact
+          path: ./lambda.zip
+
       - name: Upload Lambda Code to S3
         run: |
           aws s3 cp lambda.zip s3://${{ needs.deploy.outputs.lambda_bucket_name }}/lambda.zip
@@ -58,16 +71,3 @@ jobs:
       - name: Clean Up
         run: terraform destroy -auto-approve ./terraform
         if: always()
-
-      - name: Upload Lambda Code to S3
-        run: |
-          # Build your Go Lambda code
-          go build -o main ./lambda
-          zip -j lambda.zip main
-          aws s3 cp lambda.zip s3://${{ needs.deploy.outputs.lambda_bucket_name }}/lambda.zip
-
-      - name: Deploy Lambda Code
-        run: |
-          aws lambda update-function-code --function-name ${{ needs.deploy.outputs.lambda_function_name }} --s3-bucket ${{ needs.deploy.outputs.lambda_bucket_name }} --s3-key lambda.zip
-
-      
