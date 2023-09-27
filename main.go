@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	lambda.Start(router)
+	lambda.Start(handler)
 }

@@ -2,28 +2,20 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
-	"log"
-
+	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 )
 
-const TableName = "Resume"
-
-var db *dynamodb.Client
-
-func init() {
-	ctx := context.Background()
-	cfg, err := config.LoadDefaultConfig(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	db = dynamodb.NewFromConfig(cfg)
-}
+var (
+	dynamoDBClient *dynamodb.Client
+	tableName      = "ResumeTable"
+)
 
 type Resume struct {
 	Id        string      `json:"id" dynamodbav:"id"`
@@ -60,60 +52,117 @@ type Skill struct {
 	Name string `json:"name" dynamodbav:"name"`
 }
 
-func saveResume(ctx context.Context, resume Resume) error {
-	// Marshal the Resume object into a DynamoDB AttributeValue map
-	av, err := attributevalue.MarshalMap(resume)
+func init() {
+	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
-		log.Printf("Error marshaling resume: %v", err)
-		return err
+		panic(fmt.Sprintf("error loading AWS config: %v", err))
 	}
 
-	// Create a PutItemInput with the marshaled Resume and table name
-	input := &dynamodb.PutItemInput{
-		Item:      av,
-		TableName: aws.String(TableName),
-	}
-
-	// Put the item into the DynamoDB table
-	_, err = db.PutItem(ctx, input)
-	if err != nil {
-		log.Printf("Error saving resume: %v", err)
-		return err
-	}
-
-	return nil
+	dynamoDBClient = dynamodb.NewFromConfig(cfg)
 }
 
-func getResume(ctx context.Context, resumeID string) (Resume, error) {
-	// Create a GetItemInput with the key and table name
-	input := &dynamodb.GetItemInput{
-		Key: map[string]dynamodb.AttributeValue{
-			"id": &dynamodb.AttributeValue{
-				S: aws.String(resumeID),
+func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	// Extract the resume ID from the query string
+	resumeID := request.QueryStringParameters["id"]
+	if resumeID == "" {
+		// If the 'id' parameter is not provided, perform a scan operation to retrieve all items from DynamoDB
+		scanInput := &dynamodb.ScanInput{
+			TableName: aws.String(tableName),
+		}
+
+		result, err := dynamoDBClient.Scan(ctx, scanInput)
+		if err != nil {
+			return events.APIGatewayProxyResponse{
+				Body:       fmt.Sprintf("Error: %v", err),
+				StatusCode: 500,
+			}, err
+		}
+
+		// Serialize the list of items to JSON
+		var resumes []Resume
+		for _, item := range result.Items {
+			var resume Resume
+			err := attributevalue.UnmarshalMap(item, &resume)
+			if err != nil {
+				return events.APIGatewayProxyResponse{
+					Body:       fmt.Sprintf("Error: %v", err),
+					StatusCode: 500,
+				}, err
+			}
+			resumes = append(resumes, resume)
+		}
+
+		resumesJSON, err := json.Marshal(resumes)
+		if err != nil {
+			return events.APIGatewayProxyResponse{
+				Body:       fmt.Sprintf("Error: %v", err),
+				StatusCode: 500,
+			}, err
+		}
+
+		// Customize the response body and status code
+		response := events.APIGatewayProxyResponse{
+			Body:       string(resumesJSON),
+			StatusCode: 200,
+			Headers: map[string]string{
+				"Content-Type": "application/json",
 			},
+		}
+
+		return response, nil
+	}
+
+	// If the 'id' parameter is provided, retrieve the specific resume from DynamoDB
+	getItemInput := &dynamodb.GetItemInput{
+		TableName: aws.String(tableName),
+		Key: map[string]types.AttributeValue{
+			"id": &types.AttributeValueMemberS{Value: resumeID},
 		},
-		TableName: aws.String(TableName),
 	}
 
-	// Get the item from the DynamoDB table
-	result, err := db.GetItem(ctx, input)
+	result, err := dynamoDBClient.GetItem(ctx, getItemInput)
 	if err != nil {
-		log.Printf("Error fetching resume: %v", err)
-		return Resume{}, err
+		return events.APIGatewayProxyResponse{
+			Body:       fmt.Sprintf("Error: %v", err),
+			StatusCode: 500,
+		}, err
 	}
 
-	// Check if the item was found
-	if len(result.Item) == 0 {
-		return Resume{}, fmt.Errorf("Resume not found")
+	// Check if the resume was found in DynamoDB
+	if result.Item == nil {
+		return events.APIGatewayProxyResponse{
+			Body:       "Resume not found",
+			StatusCode: 404,
+		}, nil
 	}
 
-	// Unmarshal the DynamoDB item into a Resume object
+	// Deserialize the resume data into the Resume struct
 	var resume Resume
 	err = attributevalue.UnmarshalMap(result.Item, &resume)
 	if err != nil {
-		log.Printf("Error unmarshaling resume: %v", err)
-		return Resume{}, err
+		return events.APIGatewayProxyResponse{
+			Body:       fmt.Sprintf("Error: %v", err),
+			StatusCode: 500,
+		}, err
 	}
 
-	return resume, nil
+	// Serialize the Resume struct to JSON
+	resumeJSON, err := json.Marshal(resume)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			Body:       fmt.Sprintf("Error: %v", err),
+			StatusCode: 500,
+		}, err
+	}
+
+	// Customize the response body and status code
+	response := events.APIGatewayProxyResponse{
+		Body:       string(resumeJSON),
+		StatusCode: 200,
+		Headers: map[string]string{
+			"Content-Type": "application/json",
+		},
+	}
+
+	return response, nil
 }
