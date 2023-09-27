@@ -86,7 +86,6 @@ jobs:
       - name: Upload Lambda Code to S3
         run: |
           echo ${{needs.deploy.outputs.lambda_bucket_name}}
-          echo ${{deploy.outputs.lambda_bucket_name}}
           echo ${{steps.outputs.lambda_bucket_name}}
           echo ${{lambda_bucket_name}}
           echo ${{outputs.lambda_bucket_name}}
