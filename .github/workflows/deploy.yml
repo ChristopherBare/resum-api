@@ -38,7 +38,7 @@ jobs:
 
     env:
       AWS_DEFAULT_REGION: us-east-1
-      S3_BUCKET_NAME: ${{ steps.read-output.outputs.lambda_bucket_name }}
+      S3_BUCKET_NAME: ${{ jobs.deploy.read-output.outputs.lambda_bucket_name }}
 
     steps:
       - name: configureawscredentials
