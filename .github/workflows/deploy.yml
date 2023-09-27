@@ -65,11 +65,12 @@ jobs:
           cd ./terraform/stage_1
           terraform init
           terraform apply -auto-approve
+          BUCKET_NAME=$(terraform output -raw lambda_bucket_name)"
 
       - name: Upload Lambda Code to S3
         run: |
-          echo deploy.outputs.lambda_bucket_name
-          aws s3 cp lambda.zip s3://${{ needs.deploy.outputs.lambda_bucket_name }}/lambda.zip
+          echo BUCKET_NAME
+          aws s3 cp lambda.zip s3://${{ BUCKET_NAME }}/lambda.zip
         if: success()
 
       - name: Terraform Apply Stage 2
