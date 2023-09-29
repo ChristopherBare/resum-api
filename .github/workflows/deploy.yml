@@ -70,6 +70,8 @@ jobs:
           cd ./terraform/stage_1
           terraform init
           terraform apply -auto-approve
+          ls -a
+          cat output.txt
 
       - name: Capture Terraform Output
         run: |
