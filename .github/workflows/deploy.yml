@@ -70,24 +70,11 @@ jobs:
           cd ./terraform/stage_1
           terraform init
           terraform apply -auto-approve
-          ls -a
-          cat output.txt
-
-      - name: Capture Terraform Output
-        run: |
-          echo "lambda_bucket_name=$(terraform output -raw lambda_bucket_name)" >> output.txt
-          echo $(terraform output -raw lambda_bucket_name)
-        working-directory: ./terraform/stage_1
-
-      - name: Read Terraform Output
-        id: read-output
-        run: |
-          ls -a
-          cat output.txt
-          LAMBDA_BUCKET_NAME=$(cat output.txt | jq -r '.lambda_bucket_name.value')
-          echo LAMBDA_BUCKET_NAME
+          LAMBDA_BUCKET_NAME=$(cat output.txt | jq -r 'lambda_bucket_name.value')
           echo "LAMBDA_BUCKET_NAME=${LAMBDA_BUCKET_NAME}" >> $GITHUB_ENV
-        working-directory: ./terraform/stage_1
+          ls -a
+          cat output.txt
+
 
       - name: Upload Lambda Code to S3
         run: |
