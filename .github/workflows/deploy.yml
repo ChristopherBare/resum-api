@@ -81,7 +81,9 @@ jobs:
         id: read-output
         run: |
           ls -a
-          LAMBDA_BUCKET_NAME=$(cat output.txt)
+          cat output.txt
+          LAMBDA_BUCKET_NAME=$(cat output.txt | jq -r '.lambda_bucket_name.value')
+          echo LAMBDA_BUCKET_NAME
           echo "LAMBDA_BUCKET_NAME=${LAMBDA_BUCKET_NAME}" >> $GITHUB_ENV
         working-directory: ./terraform/stage_1
 
