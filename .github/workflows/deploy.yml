@@ -80,12 +80,13 @@ jobs:
       - name: Read Terraform Output
         id: read-output
         run: |
-          echo "::set-output name=lambda_bucket_name::$(cat output.txt)"
+          export LAMBDA_BUCKET_NAME=$(cat output.txt)
+          echo "LAMBDA_BUCKET_NAME=${LAMBDA_BUCKET_NAME}" >> $GITHUB_ENV
         working-directory: ./terraform/stage_1
 
       - name: Upload Lambda Code to S3
         run: |
-          aws s3 cp lambda.zip s3://${{ steps.read-output.outputs.lambda_bucket_name }}/lambda.zip
+          aws s3 cp lambda.zip s3://${{ env.LAMBDA_BUCKET_NAME }}/lambda.zip
         if: success()
 
       - name: Terraform Apply Stage 2
