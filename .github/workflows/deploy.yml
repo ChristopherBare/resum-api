@@ -80,7 +80,7 @@ jobs:
       - name: Read Terraform Output
         id: read-output
         run: |
-          export LAMBDA_BUCKET_NAME=$(cat output.txt)
+          LAMBDA_BUCKET_NAME=$(cat output.txt)
           echo "LAMBDA_BUCKET_NAME=${LAMBDA_BUCKET_NAME}" >> $GITHUB_ENV
         working-directory: ./terraform/stage_1
 
