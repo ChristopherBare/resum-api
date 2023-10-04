@@ -1,13 +1,8 @@
 # terraform.tfvars
-bucket_short_name = "lambda_bucket"
+bucket_short_name = "lambda-bucket"
 github_repo       = "resum-api"
 github_repo_user  = "ChristopherBare"
-repository_name   = {
-  default = data.github_repository.repo.name
-}
-branch_name = {
-  default = "master"
-}
+branch_name = "master"
 github_repo_full = {
   name = "ChristopherBare/resum-api"
 }
