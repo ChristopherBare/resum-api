@@ -4,7 +4,7 @@ resource "aws_s3_bucket" "example_bucket" {
 
 # Step 2: Use a data source to fetch repository and branch information (GitHub in this example)
 data "github_repository" "repo" {
-  full_name = "${var.github_repo_user}/${var.github_repo}"
+  full_name = var.github_repo_full
 }
 
 # Step 4: Create an S3 bucket
