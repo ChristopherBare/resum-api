@@ -9,5 +9,5 @@ branch_name = {
   default = "master"
 }
 github_repo_full = {
-  name = "${var.github_repo_user}/${var.github_repo}"
+  name = "ChristopherBare/resum-api"
 }
