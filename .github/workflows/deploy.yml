@@ -67,6 +67,7 @@ jobs:
 
       - name: Terraform Apply Stage 1
         run: |
+          export LANG="en_US.UTF-8"
           cd ./terraform/stage_1
           terraform init
           terraform apply -auto-approve
