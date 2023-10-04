@@ -72,8 +72,8 @@ jobs:
           terraform apply -auto-approve
           terraform output -json > outputs.json
           cat outputs.json
-          cat outputs.json | jq '.lambda_bucket_name.value'
-          LAMBDA_BUCKET_NAME=$(cat outputs.json | jq '.lambda_bucket_name.value')
+          cat outputs.json | jq '.lambda_bucket_name.value | tostring'
+          LAMBDA_BUCKET_NAME=$(cat outputs.json | jq '.lambda_bucket_name.value | tostring')
           echo "LAMBDA_BUCKET_NAME=${LAMBDA_BUCKET_NAME}" >> $GITHUB_ENV
           ls -a
           cat outputs.json
