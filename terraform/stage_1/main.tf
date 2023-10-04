@@ -1,5 +1,15 @@
-resource "aws_s3_bucket" "lambda_bucket" {
-  bucket = "lambda-bucket-${random_uuid.uuid.result}"
+resource "aws_s3_bucket" "example_bucket" {
+  bucket = var.bucket_short_name
 }
 
-resource "random_uuid" "uuid" {}
+# Step 2: Use a data source to fetch repository and branch information (GitHub in this example)
+data "github_repository" "repo" {
+  full_name = "${var.github_repo_user}/${var.github_repo}"
+}
+
+# Step 4: Create an S3 bucket
+resource "aws_s3_bucket" "lambda_bucket" {
+  bucket = "${var.bucket_short_name}-${var.repository_name}-${var.branch_name}"
+}
+
+
