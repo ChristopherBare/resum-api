@@ -10,9 +10,7 @@ variable "github_repo_user" {
 variable "github_repo_full" {
   description = "full repo name"
 }
-variable "repository_name" {
-  description = "repository name from github data resource"
-}
+
 variable "branch_name" {
   default = "master"
   description = "default branch name"
