@@ -72,10 +72,9 @@ jobs:
           terraform apply -auto-approve
           terraform output -json > outputs.json
           ls
-          LAMBDA_BUCKET_NAME=$(cat outputs.json | jq -r 'lambda_bucket_name')
+          LAMBDA_BUCKET_NAME=$(cat outputs.json | jq -r '.lambda_bucket_name.value')
           echo "LAMBDA_BUCKET_NAME=${LAMBDA_BUCKET_NAME}" >> $GITHUB_ENV
-          ls -a
-          cat outputs.json
+          
 
 
       - name: Upload Lambda Code to S3
