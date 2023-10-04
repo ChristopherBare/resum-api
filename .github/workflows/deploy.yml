@@ -78,6 +78,11 @@ jobs:
           terraform init
           terraform apply -auto-approve
           terraform output -json > outputs.json
+          if jq -e . <<< outputs.json > /dev/null; then
+          echo "JSON is valid"
+          else
+          echo "JSON is not valid"
+          fi
           cat outputs.json
           jq --version
           LAMBDA_BUCKET_NAME=$(cat outputs.json | jq '.lambda_bucket_name.value')
