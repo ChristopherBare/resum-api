@@ -78,7 +78,9 @@ jobs:
           terraform init
           terraform apply -auto-approve
           terraform output -json > outputs.json
-          if jq -e . <<< outputs.json > /dev/null; then
+          json_data=$(cat output.json)
+          formatted_json=$(jq '.' <<< "$json_data")
+          if jq -e . <<< $formatted_json > /dev/null; then
           echo "JSON is valid"
           else
           echo "JSON is not valid"
