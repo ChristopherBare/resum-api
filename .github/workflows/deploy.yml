@@ -71,10 +71,9 @@ jobs:
           cd ./terraform/stage_1
           terraform init
           terraform apply -auto-approve
-          terraform output > outputs.txt
+          terraform output -raw lambda_bucket_name > outputs.txt
           cat outputs.txt
-          json_data=$(cat outputs.txt)
-          LAMBDA_BUCKET_NAME=$(echo "$json_data" | jq '.lambda_bucket_name.value')
+          LAMBDA_BUCKET_NAME=$(cat outputs.txt | jq '.')
           echo "LAMBDA_BUCKET_NAME=${LAMBDA_BUCKET_NAME}" >> $GITHUB_ENV
           ls -a
           cat outputs.json
