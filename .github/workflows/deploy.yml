@@ -73,7 +73,7 @@ jobs:
           terraform output -json > outputs.json
           cat outputs.json
           cat outputs.json | jq -r '.lambda_bucket_name.value'
-          LAMBDA_BUCKET_NAME=$(cat outputs.json | jq -r '.lambda_bucket_name.value')
+          LAMBDA_BUCKET_NAME=$(cat outputs.json | jq '.lambda_bucket_name.value')
           echo "LAMBDA_BUCKET_NAME=${LAMBDA_BUCKET_NAME}" >> $GITHUB_ENV
           ls -a
           cat outputs.json
