@@ -71,6 +71,7 @@ jobs:
           terraform init
           terraform apply -auto-approve
           terraform output 
+          ls
           LAMBDA_BUCKET_NAME=$(cat output.txt | jq -r 'lambda_bucket_name.value')
           echo "LAMBDA_BUCKET_NAME=${LAMBDA_BUCKET_NAME}" >> $GITHUB_ENV
           ls -a
