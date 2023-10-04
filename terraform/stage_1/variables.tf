@@ -1,6 +1,19 @@
-variable "bucket_short_name" {}
-variable "github_repo" {}
-variable "github_repo_user" {}
-variable "github_repo_full" {}
-variable "repository_name" {}
-variable "branch_name" {}
+variable "bucket_short_name" {
+  description = "bucket name"
+}
+variable "github_repo" {
+  description = "repo name"
+}
+variable "github_repo_user" {
+  description = "repo user name"
+}
+variable "github_repo_full" {
+  description = "full repo name"
+}
+variable "repository_name" {
+  description = "repository name from github data resource"
+}
+variable "branch_name" {
+  default = "master"
+  description = "default branch name"
+}
