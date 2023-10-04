@@ -12,6 +12,5 @@ variable "github_repo_full" {
 }
 
 variable "branch_name" {
-  default = "master"
   description = "default branch name"
 }
