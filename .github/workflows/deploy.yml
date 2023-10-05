@@ -77,8 +77,10 @@ jobs:
           cd ./terraform/stage_1
           terraform init
           terraform apply -auto-approve
-          terraform output -json > outputs.json
+          terraform output -json bucket_name > outputs.json
           json_data=$(cat outputs.json)
+          echo "json_data"
+          echo $json_data
           echo "formatting json"
           formatted_json=$(jq '.' <<< "$json_data")
           echo "validating json"
@@ -89,7 +91,7 @@ jobs:
           fi
           cat outputs.json
           jq --version
-          LAMBDA_BUCKET_NAME=$(cat outputs.json | jq '.lambda_bucket_name.value')
+          LAMBDA_BUCKET_NAME=$(cat outputs.json)
           echo "LAMBDA_BUCKET_NAME=${LAMBDA_BUCKET_NAME}" >> $GITHUB_ENV
           ls -a
           cat outputs.json
