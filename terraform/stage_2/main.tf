@@ -19,7 +19,7 @@ resource "aws_lambda_function" "resum_api_lambda" {
 }
 
 data "aws_iam_role" "existing_lambda_role" {
-  name = aws_iam_role.lambda_exec_role.name
+  name = "lambda_role"
 }
 
 resource "aws_iam_role" "lambda_exec_role" {
