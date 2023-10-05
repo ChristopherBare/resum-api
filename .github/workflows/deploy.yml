@@ -84,11 +84,9 @@ jobs:
           echo "LAMBDA_BUCKET_NAME: \"${LAMBDA_BUCKET_NAME}\""
           echo "LAMBDA_BUCKET_NAME=\"${LAMBDA_BUCKET_NAME}\"" >> $GITHUB_ENV
 
-
-
       - name: Upload Lambda Code to S3
         run: |
-          aws s3 cp lambda.zip s3://${{ env.LAMBDA_BUCKET_NAME }}/lambda.zip
+          aws s3 cp lambda.zip s3://${{ env.LAMBDA_BUCKET_NAME }}
         if: success()
 
       - name: Terraform Apply Stage 2
