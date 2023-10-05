@@ -81,17 +81,7 @@ jobs:
           json_data=$(cat outputs.json)
           echo "json_data"
           echo "$json_data
-          echo "formatting json"
-          formatted_json=$(jq '.' <<< "$json_data")
-          echo "$formatted_json"
-          echo "validating json"
-          if jq -e . <<< "$formatted_json" > /dev/null; then
-          echo "JSON is valid"
-          else
-          echo "JSON is not valid"
-          fi
           cat outputs.json
-          jq --version
           LAMBDA_BUCKET_NAME=$(cat outputs.json)
           echo "LAMBDA_BUCKET_NAME=${LAMBDA_BUCKET_NAME}" >> $GITHUB_ENV
           ls -a
