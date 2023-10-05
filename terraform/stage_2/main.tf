@@ -8,6 +8,10 @@ data "terraform_remote_state" "stage_1" {
   }
 }
 
+resource "random_id" "unique_id" {
+  byte_length = 8  # You can adjust the length as needed
+}
+
 resource "aws_lambda_function" "resum_api_lambda" {
   function_name    = "resum-api-lambda"
   role             = aws_iam_role.lambda_exec_role.arn
@@ -18,7 +22,7 @@ resource "aws_lambda_function" "resum_api_lambda" {
 }
 
 resource "aws_iam_role" "lambda_exec_role" {
-  name = "lambda_role-${timestamp()}"
+  name = "lambda_role-${random_id.unique_id.hex}"
 
   assume_role_policy = <<EOF
 {
