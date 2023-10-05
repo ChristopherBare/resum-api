@@ -80,11 +80,11 @@ jobs:
           terraform output -json bucket_name > outputs.json
           json_data=$(cat outputs.json)
           echo "json_data"
-          echo $json_data
+          echo "$json_data
           echo "formatting json"
           formatted_json=$(jq '.' <<< "$json_data")
           echo "validating json"
-          if jq -e . <<< $formatted_json > /dev/null; then
+          if jq -e . <<< "$formatted_json" > /dev/null; then
           echo "JSON is valid"
           else
           echo "JSON is not valid"
