@@ -77,7 +77,7 @@ jobs:
           cd ./terraform/stage_1
           terraform init
           terraform apply -auto-approve
-          terraform output bucket_name > outputs.json
+          terraform output bucket_name > outputs.txt
           json_data=$(cat outputs.txt)
           echo "json_data"
           echo "$json_data
