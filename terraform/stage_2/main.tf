@@ -11,11 +11,15 @@ data "terraform_remote_state" "stage_1" {
 
 resource "aws_lambda_function" "resum_api_lambda" {
   function_name    = "resum-api-lambda"
-  role             = aws_iam_role.lambda_exec_role.arn
+  role             = data.aws_iam_role.existing_lambda_role.arn
   handler          = "main"
   runtime          = "go1.x"
   s3_bucket = data.terraform_remote_state.stage_1.outputs.bucket_name
   s3_key = "lambda.zip"
+}
+
+data "aws_iam_role" "existing_lambda_role" {
+  name = aws_iam_role.lambda_exec_role.name
 }
 
 resource "aws_iam_role" "lambda_exec_role" {
