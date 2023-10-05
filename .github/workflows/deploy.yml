@@ -83,6 +83,7 @@ jobs:
           echo "$json_data
           echo "formatting json"
           formatted_json=$(jq '.' <<< "$json_data")
+          echo "$formatted_json"
           echo "validating json"
           if jq -e . <<< "$formatted_json" > /dev/null; then
           echo "JSON is valid"
