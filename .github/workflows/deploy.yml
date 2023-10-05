@@ -80,7 +80,7 @@ jobs:
           terraform output bucket_name | sed 's/^ *"\(.*\)" *$/\1/' > output.txt
           json_data=$(cat output.txt)
           echo "JSON_DATA: \"$json_data\""
-          LAMBDA_BUCKET_NAME="$(echo $json_data | awk -F ' ::' '{print $1}')"
+          LAMBDA_BUCKET_NAME="$(echo $json_data | grep bucket_name | awk -F ' ::' '{print $2}')"
           echo "LAMBDA_BUCKET_NAME: \"${LAMBDA_BUCKET_NAME}\""
           echo "LAMBDA_BUCKET_NAME=\"${LAMBDA_BUCKET_NAME}\"" >> $GITHUB_ENV
 
