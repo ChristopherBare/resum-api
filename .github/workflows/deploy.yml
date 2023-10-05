@@ -80,11 +80,9 @@ jobs:
           terraform output bucket_name | sed 's/^ *"\(.*\)" *$/\1/' > output.txt
           json_data=$(cat output.txt)
           echo "JSON_DATA: $json_data"
-          cat outputs.txt
           LAMBDA_BUCKET_NAME="$json_data"
           echo "LAMBDA_BUCKET_NAME=${LAMBDA_BUCKET_NAME}" >> $GITHUB_ENV
-          ls -a
-          cat outputs.txt
+
 
 
       - name: Upload Lambda Code to S3
