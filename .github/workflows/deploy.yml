@@ -81,13 +81,13 @@ jobs:
           json_data=$(cat output.txt)
           echo "JSON_DATA: \"$json_data\""
           LAMBDA_BUCKET_NAME="$(echo $json_data | grep -o 'bucket_name[[:space:]]*[^[:space:]]*' | awk '{print $2}')"
-          echo "LAMBDA_BUCKET_NAME: \"${LAMBDA_BUCKET_NAME}\""
-          echo "LAMBDA_BUCKET_NAME=\"${LAMBDA_BUCKET_NAME}\"" >> $GITHUB_ENV
+          echo "LAMBDA_BUCKET_NAME: ${LAMBDA_BUCKET_NAME}"
+          echo "LAMBDA_BUCKET_NAME=${LAMBDA_BUCKET_NAME}" >> $GITHUB_ENV
 
       - name: Upload Lambda Code to S3
         run: |
           ls -a
-          aws s3 cp lambda.zip s3://${{ env.LAMBDA_BUCKET_NAME }}
+          aws s3 cp ./lambda.zip s3://${{ env.LAMBDA_BUCKET_NAME }}
         if: success()
 
       - name: Terraform Apply Stage 2
