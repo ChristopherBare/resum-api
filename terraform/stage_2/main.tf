@@ -14,31 +14,16 @@ resource "random_id" "unique_id" {
 
 resource "aws_lambda_function" "resum_api_lambda" {
   function_name    = "resum-api-lambda"
-  role             = aws_iam_role.lambda_exec_role.arn
+  role             = data.aws_iam_role.lambda_exec_role.arn
   handler          = "main"
   runtime          = "go1.x"
   s3_bucket = data.terraform_remote_state.stage_1.outputs.bucket_name
   s3_key = "lambda.zip"
 }
 
-resource "aws_iam_role" "lambda_exec_role" {
-  name = "lambda_role-${random_id.unique_id.hex}"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
+data "aws_iam_role" "lambda_exec_role"{
+  name = "github-actions-role"
+  arn = "arn:aws:iam::726032046446:role/github-actions-role"
 }
 
 
