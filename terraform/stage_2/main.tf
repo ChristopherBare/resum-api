@@ -15,6 +15,7 @@ resource "aws_lambda_function" "resum_api_lambda" {
   handler          = "main"
   runtime          = "go1.x"
   s3_bucket = data.terraform_remote_state.stage_1.outputs.bucket_name
+  s3_key = "lambda.zip"
 }
 
 resource "aws_iam_role" "lambda_exec_role" {
