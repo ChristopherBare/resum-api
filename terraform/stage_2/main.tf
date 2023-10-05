@@ -22,7 +22,7 @@ resource "aws_lambda_function" "resum_api_lambda" {
 }
 
 data "aws_iam_role" "lambda_exec_role"{
-  name = "github-actions-role"
+  name = "lambda_role"
 }
 
 
