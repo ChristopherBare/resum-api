@@ -1,5 +1,5 @@
 # terraform.tfvars
-bucket_short_name = "apiii-bucket"
+bucket_short_name = "apiiii-bucket"
 github_repo       = "resum-api"
 github_repo_user  = "ChristopherBare"
 branch_name = "master"
