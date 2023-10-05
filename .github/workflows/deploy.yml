@@ -94,10 +94,15 @@ jobs:
           cd ./terraform/stage_2
           terraform init
           terraform apply -auto-approve
+          terraform output lambda_function_name | sed 's/^ *"\(.*\)" *$/\1/' > output.txt
+          json_data=$(cat output.txt)
+          LAMBDA_FUNCTION_NAME="$(echo $json_data | grep -o 'lambda_function_name[[:space:]]*[^[:space:]]*' | awk '{print $2}')"
+          echo "LAMBDA_FUNCTION_NAME: ${LAMBDA_FUNCTION_NAME}"
+          echo "LAMBDA_FUNCTION_NAME=${LAMBDA_FUNCTION_NAME}" >> $GITHUB_ENV
 
       - name: Deploy Lambda Code
         run: |
-          aws lambda update-function-code --function-name ${{ needs.deploy.outputs.lambda_function_name }} --s3-bucket ${{ needs.deploy.outputs.lambda_bucket_name }} --s3-key lambda.zip
+          aws lambda update-function-code --function-name ${{ env.LAMBDA_FUNCTION_NAME }} --s3-bucket ${{ env.LAMBDA_BUCKET_NAME }} --s3-key lambda.zip
         if: success()
 
       - name: Clean Up
