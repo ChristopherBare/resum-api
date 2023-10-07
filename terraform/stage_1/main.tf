@@ -14,7 +14,6 @@ resource "null_resource" "set_create_bucket" {
 resource "aws_s3_bucket" "lambda_bucket" {
   count = var.create_bucket ? 1 : 0
   bucket = "${var.bucket_short_name}-${var.github_repo}-${var.branch_name}"
-  force_destroy = true
 }
 
 # Set the `create_bucket` variable based on the existence of the S3 bucket
