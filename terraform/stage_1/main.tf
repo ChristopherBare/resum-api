@@ -22,7 +22,7 @@ resource "aws_s3_bucket" "lambda_bucket" {
 }
 
 data "aws_s3_bucket" "bucket_check" {
-  bucket = aws_s3_bucket.lambda_bucket.bucket
+  bucket = "${var.bucket_short_name}-${var.github_repo}-${var.branch_name}"
 }
 
 # Set the `create_bucket` variable based on the existence of the S3 bucket
