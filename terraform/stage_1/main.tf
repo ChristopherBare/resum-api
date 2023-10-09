@@ -26,7 +26,7 @@ resource "aws_s3_bucket" "lambda_bucket" {
 variable "create_bucket" {
   description = "Create the S3 bucket if it doesn't exist"
   type        = bool
-  default     = false
+  default     = true
 }
 
 
