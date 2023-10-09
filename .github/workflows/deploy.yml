@@ -29,7 +29,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: lambda-artifact
-          path: ./lambda.zip
+          path: ./zip
 
 
 
@@ -69,41 +69,13 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: lambda-artifact
-          path: ./lambda.zip
+          path: ./zip
 
-      - name: Terraform Apply Stage 1
+      - name: Terraform Apply
         run: |
-          export LANG="en_US.UTF-8"
-          cd ./terraform/stage_1
+          cd ./terraform
           terraform init
           terraform apply -auto-approve
-          terraform output bucket_name | sed 's/^ *"\(.*\)" *$/\1/' > output.txt
-          json_data=$(cat output.txt)
-          echo "JSON_DATA: \"$json_data\""
-          LAMBDA_BUCKET_NAME="$(echo $json_data | grep -o 'bucket_name[[:space:]]*[^[:space:]]*' | awk '{print $2}')"
-          echo "LAMBDA_BUCKET_NAME: ${LAMBDA_BUCKET_NAME}"
-          echo "LAMBDA_BUCKET_NAME=${LAMBDA_BUCKET_NAME}" >> $GITHUB_ENV
-
-      - name: Upload Lambda Code to S3
-        run: |
-          aws s3 cp lambda.zip/lambda.zip s3://${{ env.LAMBDA_BUCKET_NAME }}/lambda.zip
-        if: success()
-
-      - name: Terraform Apply Stage 2
-        run: |
-          cd ./terraform/stage_2
-          terraform init
-          terraform apply -auto-approve
-          terraform output lambda_function_name | sed 's/^ *"\(.*\)" *$/\1/' > output.txt
-          json_data=$(cat output.txt)
-          LAMBDA_FUNCTION_NAME="$(echo $json_data | grep -o 'lambda_function_name[[:space:]]*[^[:space:]]*' | awk '{print $2}')"
-          echo "LAMBDA_FUNCTION_NAME: ${LAMBDA_FUNCTION_NAME}"
-          echo "LAMBDA_FUNCTION_NAME=${LAMBDA_FUNCTION_NAME}" >> $GITHUB_ENV
-
-      - name: Deploy Lambda Code
-        run: |
-          aws lambda update-function-code --function-name ${{ env.LAMBDA_FUNCTION_NAME }} --s3-bucket ${{ env.LAMBDA_BUCKET_NAME }} --s3-key lambda.zip
-        if: success()
 
       - name: Clean Up
         run: terraform destroy -auto-approve ./terraform
