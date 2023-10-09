@@ -80,6 +80,5 @@ jobs:
 
       - name: Clean Up
         run: |
-          terraform init -reconfigure
           terraform destroy -auto-approve ./terraform
         if: always()
