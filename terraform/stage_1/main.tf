@@ -12,7 +12,7 @@ resource "null_resource" "set_create_bucket" {
   }
 }
 resource "aws_s3_bucket" "lambda_bucket" {
-  count = var.create_bucket ? 1 : 0
+  count  = var.create_bucket ? 1 : 0
   bucket = "${var.bucket_short_name}-${var.github_repo}-${var.branch_name}"
 }
 
