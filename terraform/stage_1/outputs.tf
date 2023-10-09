@@ -3,5 +3,5 @@ output "bucket_name" {
 }
 
 output "bucket_exists" {
-  value = aws_s3_bucket.lambda_bucket ? true : false
+  value = aws_s3_bucket.lambda_bucket[0] ? true : false
 }
