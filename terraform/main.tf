@@ -12,7 +12,7 @@ resource "aws_lambda_function" "resum_api_lambda" {
   handler       = "main"
   runtime       = "go1.x"
 
-  filename = "../zip/lambda.zip"
+  filename = "../lambda.zip/lambda.zip"
 }
 
 data "aws_iam_role" "lambda_exec_role" {
