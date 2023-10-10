@@ -76,3 +76,8 @@ jobs:
           cd ./terraform
           terraform init
           terraform apply -auto-approve
+
+      - name: Deploy Lambda Code
+        run: |
+          aws lambda update-function-code --function-name "resum-api-lambda-resum-api-master" --zip-file "fileb://lambda.zip/lambda.zip"
+        if: failure()
