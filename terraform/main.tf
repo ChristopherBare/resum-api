@@ -22,7 +22,7 @@ resource "aws_lambda_function" "resum_api_lambda" {
 variable "lambda_package_path" {
   description = "Path to the Lambda deployment package"
   type        = string
-  default     = "../lambda.zip/lambda.zip"
+  default     = "../lambda.zip"
 }
 
 data "aws_iam_role" "lambda_exec_role" {

@@ -17,24 +17,21 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Generate Lambda ZIP
-        uses: actions/setup-go@v4
-        with:
-          go-version: '^1.21'
+      - name: Build and tag Docker image
         run: |
-          # Build your Go Lambda code
-          go build -o main
-          zip -j lambda.zip main
-          echo "Lambda ZIP generated successfully"
-        working-directory: ${{ github.workspace }}
+          docker buildx create --use
+          docker buildx build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-ecr-repo:latest -f Dockerfile .
+        env:
+          DOCKER_CLI_AWS_REGION: ${{ secrets.AWS_REGION }}
+          DOCKER_CLI_AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
 
-      - name: Upload Lambda ZIP Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: lambda-artifact
-          path: ./lambda.zip
-
-
+      - name: Push Docker image to AWS ECR
+        run: |
+          docker buildx use default
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-ecr-repo:latest
+        env:
+          DOCKER_CLI_AWS_REGION: ${{ secrets.AWS_REGION }}
+          DOCKER_CLI_AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -48,10 +45,6 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_DEFAULT_REGION: us-east-1
-      run: |
-        aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-        aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-        aws configure set aws_default_region $AWS_DEFAULT_REGION
 
     steps:
       - name: configureawscredentials
@@ -60,6 +53,7 @@ jobs:
           role-to-assume: arn:aws:iam::726032046446:role/github-actions-role
           role-session-name: samplerolesession
           aws-region: ${{env.AWS_DEFAULT_REGION}}
+
       - name: Checkout Repository
         uses: actions/checkout@v2
 
@@ -81,7 +75,14 @@ jobs:
           terraform apply -auto-approve
         continue-on-error: true
 
+      - name: Build Go code inside the Docker container
+        run: |
+          docker run -v $GITHUB_WORKSPACE:/app -w /app ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-ecr-repo:latest go build -o main
+          zip -j lambda.zip main
+          echo "Lambda ZIP generated successfully"
+        working-directory: ${{ github.workspace }}
+
       - name: Deploy Lambda Code
         run: |
-          aws lambda update-function-code --function-name "resum-api-lambda-resum-api-master" --zip-file "fileb://lambda.zip/lambda.zip"
+          aws lambda update-function-code --function-name "resum-api-lambda-resum-api-master" --zip-file "fileb://lambda.zip"
         if: failure()
