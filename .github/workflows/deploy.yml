@@ -76,6 +76,7 @@ jobs:
           cd ./terraform
           terraform init
           terraform apply -auto-approve
+        continue-on-error: true
 
       - name: Deploy Lambda Code
         run: |
