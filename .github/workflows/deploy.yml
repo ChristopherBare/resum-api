@@ -75,10 +75,4 @@ jobs:
         run: |
           cd ./terraform
           terraform init
-          terraform plan
           terraform apply -auto-approve
-
-      - name: Clean Up
-        run: |
-          terraform destroy -auto-approve ./terraform
-        if: always()
