@@ -63,7 +63,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 0.14.x
+          terraform_version: 1.15.x
 
       - name: Download Lambda ZIP Artifact
         uses: actions/download-artifact@v2
