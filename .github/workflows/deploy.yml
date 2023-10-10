@@ -28,7 +28,7 @@ jobs:
       - name: Push Docker image to AWS ECR
         run: |
           docker buildx use default
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/my-ecr-repo:latest
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/resum-api-lambda-repo:latest
         env:
           DOCKER_CLI_AWS_REGION: ${{ secrets.AWS_REGION }}
           DOCKER_CLI_AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
