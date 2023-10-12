@@ -14,7 +14,7 @@ resource "aws_lambda_function" "resum_api_lambda" {
   function_name = "resum-api-lambda-${var.github_repo}-${var.branch_name}"
   role          = data.aws_iam_role.lambda_exec_role.arn
   handler       = "main"
-  runtime       = "go1.x"
+  runtime       = "go1.21"
   source_code_hash = local.lambda_package_checksum
   filename = var.lambda_package_path
 }
