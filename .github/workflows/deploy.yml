@@ -32,11 +32,10 @@ jobs:
         working-directory: ${{ github.workspace }}
 
       - name: Upload Lambda ZIP Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: lambda-artifact
-          path: deploy/lambda.zip
-          key: lambda.zip
+          path: lambda.zip
 
 
 
@@ -73,7 +72,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: lambda-artifact
-          path: deploy/lambda.zip
+          path: lambda.zip
 
       - name: Terraform fmt
         id: fmt
@@ -97,5 +96,5 @@ jobs:
 
       - name: Deploy Lambda Code
         run: |
-          aws lambda update-function-code --function-name "resum-api-lambda-resum-api-master" --zip-file "fileb://deploy/lambda.zip"
+          aws lambda update-function-code --function-name "resum-api-lambda-resum-api-master" --zip-file "fileb://lambda.zip"
         if: failure()
