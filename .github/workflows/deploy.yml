@@ -26,7 +26,7 @@ jobs:
       - name: Generate Lambda ZIP
         run: |
           # Build your Go Lambda code
-          GOOS=linux go build -mod=mod -o main
+          GOOS=linux CGO_ENABLED=0 go build -mod=mod -o main
           zip -j lambda.zip main
           echo "Lambda ZIP generated successfully"
         working-directory: ${{ github.workspace }}
@@ -77,19 +77,22 @@ jobs:
         id: fmt
         run: terraform fmt -check
         continue-on-error: true
+        working-directory: ${{ github.workspace }}/terraform
 
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
+        working-directory: ${{ github.workspace }}/terraform
 
       - name: Terraform Plan
         id: plan
         run: terraform plan -no-color
         continue-on-error: true
+        working-directory: ${{ github.workspace }}/terraform
 
       - name: Terraform Apply
+        working-directory: ${{ github.workspace }}/terraform
         run: |
-          cd ./terraform
           terraform init
           terraform apply -auto-approve
 
