@@ -21,7 +21,7 @@ jobs:
       - run: go version
 
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Generate Lambda ZIP
         run: |
@@ -61,7 +61,7 @@ jobs:
           aws-region: ${{env.AWS_DEFAULT_REGION}}
 
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -81,8 +81,12 @@ jobs:
 
       - name: Terraform Validate
         id: validate
-        run: terraform validate -no-color
         working-directory: ${{ github.workspace }}/terraform
+        run: |
+          pwd
+          tree .
+          terraform validate -no-color
+        
 
       - name: Terraform Plan
         id: plan
