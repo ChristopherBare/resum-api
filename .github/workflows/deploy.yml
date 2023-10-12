@@ -69,10 +69,9 @@ jobs:
           terraform_version: 1.x
 
       - name: Download Lambda ZIP Artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: lambda-artifact
-          path: lambda.zip
 
       - name: Terraform fmt
         id: fmt
