@@ -16,7 +16,6 @@ jobs:
     steps:
       - uses: actions/setup-go@v4
         with:
-          stable: 'true'
           go-version: '1.21'
       - run: go version
 
@@ -75,9 +74,15 @@ jobs:
 
       - name: Terraform fmt
         id: fmt
+        working-directory: ${{ github.workspace }}/terraform
         run: terraform fmt -check
         continue-on-error: true
+
+      - name: Terraform Init
+        id: init
         working-directory: ${{ github.workspace }}/terraform
+        run: terraform init
+
 
       - name: Terraform Validate
         id: validate
@@ -86,7 +91,7 @@ jobs:
           pwd
           tree .
           terraform validate -no-color
-        
+
 
       - name: Terraform Plan
         id: plan
