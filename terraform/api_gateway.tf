@@ -32,7 +32,7 @@ resource "aws_api_gateway_deployment" "api_deployment" {
   stage_name  = "prod"
 }
 
-resource "aws_lambda_permission" "apigw_lambda" {
+resource "aws_lambda_permission" "resum_api_lambda" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.resum_api_lambda.arn
