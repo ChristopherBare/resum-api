@@ -37,7 +37,6 @@ jobs:
           path: lambda.zip
 
 
-
   deploy:
     runs-on: ubuntu-latest
 
@@ -83,15 +82,10 @@ jobs:
         working-directory: ${{ github.workspace }}/terraform
         run: terraform init
 
-
       - name: Terraform Validate
         id: validate
         working-directory: ${{ github.workspace }}/terraform
-        run: |
-          pwd
-          tree .
-          terraform validate -no-color
-
+        run: terraform validate -no-color
 
       - name: Terraform Plan
         id: plan
@@ -100,9 +94,9 @@ jobs:
         working-directory: ${{ github.workspace }}/terraform
 
       - name: Terraform Apply
+        id: apply
         working-directory: ${{ github.workspace }}/terraform
         run: |
-          terraform init
           terraform apply -auto-approve
 
       - name: Deploy Lambda Code
