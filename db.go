@@ -225,7 +225,7 @@ func handlePostRequest(ctx context.Context, request events.APIGatewayProxyReques
 		TableName: aws.String(tableName),
 		Item:      av,
 	}
-
+	fmt.Println(putItemInput)
 	_, err = dynamoDBClient.PutItem(ctx, putItemInput)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
