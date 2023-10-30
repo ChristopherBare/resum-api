@@ -37,7 +37,6 @@ resource "aws_lambda_permission" "apigw_lambda" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.resum_api_lambda.arn
   principal     = "apigateway.amazonaws.com"
-  source_arn    = aws_api_gateway_deployment.api_deployment.execution_arn
 }
 
 
