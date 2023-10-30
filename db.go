@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 )
@@ -53,6 +54,21 @@ type Skill struct {
 	Name string `json:"name" dynamodbav:"name"`
 }
 
+// UpdateRequest is used for PATCH requests to update a resume item.
+type UpdateRequest struct {
+	Id     string       `json:"id"`
+	Update ResumeUpdate `json:"update"`
+}
+
+// ResumeUpdate represents the fields to be updated in a resume.
+type ResumeUpdate struct {
+	Name      *string     `json:"name,omitempty"`
+	Education []Education `json:"education,omitempty"`
+	Jobs      []Job       `json:"jobs,omitempty"`
+	Projects  []Project   `json:"projects,omitempty"`
+	Skills    []Skill     `json:"skills,omitempty"`
+}
+
 func init() {
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
@@ -68,6 +84,8 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		return handleGetRequest(ctx, request)
 	case "POST":
 		return handlePostRequest(ctx, request)
+	case "PATCH":
+		return handlePatch(ctx, request)
 	default:
 		return events.APIGatewayProxyResponse{
 			Body:       "Unsupported HTTP method",
@@ -219,6 +237,64 @@ func handlePostRequest(ctx context.Context, request events.APIGatewayProxyReques
 	return events.APIGatewayProxyResponse{
 		Body:       "Resume posted successfully",
 		StatusCode: 201,
+		Headers: map[string]string{
+			"Content-Type": "application/json",
+		},
+	}, nil
+}
+
+func handlePatch(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	var updateRequest UpdateRequest
+	if err := json.Unmarshal([]byte(request.Body), &updateRequest); err != nil {
+		return events.APIGatewayProxyResponse{
+			Body:       fmt.Sprintf("Error parsing request body: %v", err),
+			StatusCode: 400,
+		}, err
+	}
+
+	// Check if the "Id" is provided in the request
+	if updateRequest.Id == "" {
+		return events.APIGatewayProxyResponse{
+			Body:       "Id is required for the update operation",
+			StatusCode: 400,
+		}, nil
+	}
+
+	updateExpression, err := expression.NewBuilder().WithUpdate(
+		expression.Set(expression.Name("Name"), expression.Value(updateRequest.Update.Name)),
+		// Handle other fields (Education, Jobs, Projects, Skills) similarly
+	).Build()
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			Body:       fmt.Sprintf("Error building update expression: %v", err),
+			StatusCode: 500,
+		}, err
+	}
+
+	// Define the key of the item you want to update
+	key := map[string]types.AttributeValue{
+		"id": &types.AttributeValueMemberS{Value: updateRequest.Id},
+	}
+
+	updateItemInput := &dynamodb.UpdateItemInput{
+		TableName:                 aws.String(tableName),
+		Key:                       key,
+		UpdateExpression:          updateExpression.Update(),
+		ExpressionAttributeValues: updateExpression.Values(),
+		ReturnValues:              types.ReturnValueAllNew,
+	}
+
+	_, err = dynamoDBClient.UpdateItem(ctx, updateItemInput)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			Body:       fmt.Sprintf("Error updating item: %v", err),
+			StatusCode: 500,
+		}, err
+	}
+
+	return events.APIGatewayProxyResponse{
+		Body:       "Item updated successfully",
+		StatusCode: 200,
 		Headers: map[string]string{
 			"Content-Type": "application/json",
 		},
