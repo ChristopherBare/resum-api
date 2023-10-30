@@ -62,6 +62,7 @@ type UpdateRequest struct {
 
 // ResumeUpdate represents the fields to be updated in a resume.
 type ResumeUpdate struct {
+	Id        *string     `json:"id,omitempty"`
 	Name      *string     `json:"name,omitempty"`
 	Education []Education `json:"education,omitempty"`
 	Jobs      []Job       `json:"jobs,omitempty"`
