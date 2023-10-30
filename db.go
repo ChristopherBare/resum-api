@@ -19,6 +19,7 @@ var (
 
 type Resume struct {
 	Id        string      `json:"id" dynamodbav:"id"`
+	Name      string      `json:"name" dynamodbav:"name"`
 	Education []Education `json:"education" dynamodbav:"education"`
 	Jobs      []Job       `json:"jobs" dynamodbav:"jobs"`
 	Projects  []Project   `json:"projects" dynamodbav:"projects"`
@@ -62,6 +63,20 @@ func init() {
 }
 
 func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	switch request.HTTPMethod {
+	case "GET":
+		return handleGetRequest(ctx, request)
+	case "POST":
+		return handlePostRequest(ctx, request)
+	default:
+		return events.APIGatewayProxyResponse{
+			Body:       "Unsupported HTTP method",
+			StatusCode: 405,
+		}, nil
+	}
+}
+
+func handleGetRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	// Extract the resume ID from the query string
 	resumeID := request.QueryStringParameters["id"]
 	if resumeID == "" {
@@ -165,4 +180,47 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	}
 
 	return response, nil
+}
+
+func handlePostRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	var newResume Resume
+	if err := json.Unmarshal([]byte(request.Body), &newResume); err != nil {
+		return events.APIGatewayProxyResponse{
+			Body:       fmt.Sprintf("Error parsing request body: %v", err),
+			StatusCode: 400,
+		}, err
+	}
+
+	// Ensure the ID is unique
+	// newResume.Id = GenerateUniqueID()
+
+	// Store the new resume in DynamoDB
+	av, err := attributevalue.MarshalMap(newResume)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			Body:       fmt.Sprintf("Error marshaling resume data: %v", err),
+			StatusCode: 500,
+		}, err
+	}
+
+	putItemInput := &dynamodb.PutItemInput{
+		TableName: aws.String(tableName),
+		Item:      av,
+	}
+
+	_, err = dynamoDBClient.PutItem(ctx, putItemInput)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			Body:       fmt.Sprintf("Error storing resume in DynamoDB: %v", err),
+			StatusCode: 500,
+		}, err
+	}
+
+	return events.APIGatewayProxyResponse{
+		Body:       "Resume posted successfully",
+		StatusCode: 201,
+		Headers: map[string]string{
+			"Content-Type": "application/json",
+		},
+	}, nil
 }
