@@ -87,3 +87,8 @@ resource "aws_iam_policy" "resum_api_policy" {
       }]
   })
 }
+
+resource "aws_iam_role_policy_attachment" "attach_email_lambda_policy" {
+  policy_arn = aws_iam_policy.resum_api_policy.arn
+  role       = aws_iam_role.resum_api_lambda_role.name
+}
