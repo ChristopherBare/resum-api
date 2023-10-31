@@ -7,6 +7,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.18.42
 	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.10.43
 	github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression v1.4.71
+	github.com/google/uuid v1.4.0
 )
 
 require (

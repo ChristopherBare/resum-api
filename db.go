@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/expression"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
+	"github.com/google/uuid"
 )
 
 var (
@@ -211,7 +212,7 @@ func handlePostRequest(ctx context.Context, request events.APIGatewayProxyReques
 	}
 
 	// Ensure the ID is unique
-	// newResume.Id = GenerateUniqueID()
+	newResume.Id = GenerateUniqueID()
 
 	// Store the new resume in DynamoDB
 	av, err := attributevalue.MarshalMap(newResume)
@@ -242,6 +243,10 @@ func handlePostRequest(ctx context.Context, request events.APIGatewayProxyReques
 			"Content-Type": "application/json",
 		},
 	}, nil
+}
+
+func GenerateUniqueID() string {
+	return uuid.NewString()
 }
 
 func handlePatch(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
