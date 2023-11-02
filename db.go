@@ -29,14 +29,12 @@ type Resume struct {
 }
 
 type Education struct {
-	Id          string `json:"id" dynamodbav:"id"`
 	School      string `json:"school" dynamodbav:"school"`
 	Degree      string `json:"degree" dynamodbav:"degree"`
 	AreaOfStudy string `json:"area-of-study" dynamodbav:"area-of-study"`
 }
 
 type Job struct {
-	Id             string `json:"id" dynamodbav:"id"`
 	Company        string `json:"company" dynamodbav:"company"`
 	Title          string `json:"title" dynamodbav:"title"`
 	JobDescription string `json:"job-description" dynamodbav:"job-description"`
@@ -45,13 +43,11 @@ type Job struct {
 }
 
 type Project struct {
-	Id          string `json:"id" dynamodbav:"id"`
 	Name        string `json:"name" dynamodbav:"name"`
 	Description string `json:"description" dynamodbav:"description"`
 }
 
 type Skill struct {
-	Id   string `json:"id" dynamodbav:"id"`
 	Name string `json:"name" dynamodbav:"name"`
 }
 
@@ -210,7 +206,6 @@ func handlePostRequest(ctx context.Context, request events.APIGatewayProxyReques
 			StatusCode: 400,
 		}, err
 	}
-
 	// Ensure the ID is unique
 	newResume.Id = GenerateUniqueID()
 
