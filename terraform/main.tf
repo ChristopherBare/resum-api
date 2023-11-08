@@ -11,12 +11,12 @@ resource "random_id" "unique_id" {
 }
 
 resource "aws_lambda_function" "resum_api_lambda" {
-  function_name = "resum-api-lambda-${var.github_repo}-${var.branch_name}"
-  role          = aws_iam_role.resum_api_lambda_role.arn
-  handler       = "main"
-  runtime       = "go1.x"
+  function_name    = "resum-api-lambda-${var.github_repo}-${var.branch_name}"
+  role             = aws_iam_role.resum_api_lambda_role.arn
+  handler          = "main"
+  runtime          = "go1.x"
   source_code_hash = local.lambda_package_checksum
-  filename = var.lambda_package_path
+  filename         = var.lambda_package_path
 }
 
 variable "lambda_package_path" {
@@ -65,26 +65,26 @@ resource "aws_iam_policy" "resum_api_policy" {
       ],
       Effect   = "Allow",
       Resource = "*"
-    },
+      },
       {
-        "Effect": "Allow",
-        "Action": "iam:PassRole",
-        "Resource": "*",
-        "Condition": {
-          "StringEquals": {
-            "iam:PassedToService": "lambda.amazonaws.com"
+        "Effect" : "Allow",
+        "Action" : "iam:PassRole",
+        "Resource" : "*",
+        "Condition" : {
+          "StringEquals" : {
+            "iam:PassedToService" : "lambda.amazonaws.com"
           }
         }
       },
       {
-        "Effect": "Allow",
-        "Action": [
+        "Effect" : "Allow",
+        "Action" : [
           "logs:DescribeLogStreams",
           "logs:GetLogEvents",
           "logs:FilterLogEvents"
         ],
-        "Resource": "arn:aws:logs:*:*:log-group:/aws/lambda/*"
-      }]
+        "Resource" : "arn:aws:logs:*:*:log-group:/aws/lambda/*"
+    }]
   })
 }
 
