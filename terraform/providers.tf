@@ -1,7 +1,7 @@
-terraform{
+terraform {
   required_providers {
     github = {
-      source = "integrations/github"
+      source  = "integrations/github"
       version = "~> 5.0"
     }
   }
@@ -9,4 +9,8 @@ terraform{
 
 provider "aws" {
   region = "us-east-1"
+}
+
+provider "github" {
+  token = var.GITHUB_TOKEN
 }
