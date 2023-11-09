@@ -1,7 +1,9 @@
 provider "aws" {
   region = "us-east-1"
 }
-
+variable "GITHUB_TOKEN" {
+  type = string
+}
 provider "github" {
-  token = lookup(env, "GITHUB_TOKEN")
+  token = var.GITHUB_TOKEN
 }
