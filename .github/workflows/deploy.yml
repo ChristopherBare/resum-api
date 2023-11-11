@@ -90,7 +90,9 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -no-color
+        run: |
+          export TF_VAR_GITHUB_TOKEN=$GITHUB_TOKEN
+          terraform plan -no-color
         continue-on-error: true
         working-directory: ${{ github.workspace }}/terraform
 

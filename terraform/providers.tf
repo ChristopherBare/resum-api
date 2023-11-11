@@ -10,4 +10,6 @@ provider "aws" {
   region = "us-east-1"
 }
 
-provider "github" {}
+provider "github" {
+  token = var.GITHUB_TOKEN
+}
