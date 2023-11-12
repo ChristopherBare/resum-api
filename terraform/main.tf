@@ -1,7 +1,3 @@
-data "github_repository" "repo" {
-  full_name = var.github_repo_full.name
-}
-
 locals {
   lambda_package_checksum = filebase64(var.lambda_package_path)
 }
