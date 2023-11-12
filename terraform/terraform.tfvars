@@ -6,3 +6,4 @@ branch_name       = "master"
 github_repo_full = {
   name = "ChristopherBare/resum-api"
 }
+GITHUB_TOKEN = ""
