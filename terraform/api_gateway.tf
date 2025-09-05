@@ -26,10 +26,6 @@ resource "aws_api_gateway_integration" "api_integration" {
   uri                     = aws_lambda_function.resum_api_lambda.invoke_arn
 }
 
-resource "aws_api_gateway_deployment" "api_deployment" {
-  depends_on  = [aws_api_gateway_integration.api_integration]
-  rest_api_id = aws_api_gateway_rest_api.resum_api.id
-}
 
 resource "aws_lambda_permission" "apigw_lambda" {
   statement_id  = "AllowAPIGatewayInvoke"
@@ -89,4 +85,11 @@ resource "aws_api_gateway_integration_response" "options" {
 resource "aws_api_gateway_deployment" "lambda" {
   depends_on  = [aws_api_gateway_integration.api_integration, aws_api_gateway_integration.options_integration]
   rest_api_id = aws_api_gateway_rest_api.resum_api.id
+}
+
+# Create a stage to make the deployment accessible via a URL
+resource "aws_api_gateway_stage" "prod" {
+  rest_api_id   = aws_api_gateway_rest_api.resum_api.id
+  deployment_id = aws_api_gateway_deployment.lambda.id
+  stage_name    = "prod"
 }
