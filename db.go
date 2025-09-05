@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -226,7 +227,6 @@ func handlePostRequest(ctx context.Context, request events.APIGatewayProxyReques
 		TableName: aws.String(tableName),
 		Item:      av,
 	}
-	fmt.Println(putItemInput)
 	_, err = dynamoDBClient.PutItem(ctx, putItemInput)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
